@@ -17,11 +17,6 @@ const PATHS = {
 const jsRule = {
     test: /\.js$/,
     use: [
-        /*{ loader: 'ng-annotate-loader',
-            options: {
-                es6: true
-            }
-        },*/
         { loader: 'babel-loader',
             options: {
                 presets: [["es2015", {"modules": false}]],
