@@ -10,7 +10,7 @@ const moment = path.resolve('./node_modules', 'moment/min/moment.min.js');
 const projectTitle = 'Luxoft Web App Starter';
 
 const PATHS = {
-    app: path.resolve(__dirname, 'src'),
+    app: path.resolve(__dirname, 'app'),
     dist: path.resolve(__dirname, 'dist')
 };
 
@@ -62,6 +62,14 @@ const htmlRule = {
     ]
 };
 
+const fontsRule = {
+    test: /\.(png|woff(2)?|eot|ttf)(\?[a-z0-9=\.]+)?$/,
+    include: /app/,
+    use: [
+        {loader: 'file-loader?name=assets/[name].[ext]'}
+    ]
+};
+
 module.exports = {
     devtool: '#source-map',
     cache: true,
@@ -75,7 +83,7 @@ module.exports = {
         filename: '[name]-[hash].js'
     },
     module: {
-        rules: [jsRule, esLintRule, userStylesRule, vendorStylesRule, htmlRule],
+        rules: [jsRule, esLintRule, userStylesRule, vendorStylesRule, htmlRule, fontsRule],
         noParse: /lodash|angular|bootstrap\.min\.css/
     },
     plugins: [
@@ -94,7 +102,7 @@ module.exports = {
         }),
         new ExtractTextPlugin("styles.css"),
         new HtmlWebpackPlugin({
-            template: path.resolve(__dirname, './src', 'index.html'),
+            template: path.resolve(PATHS.app, 'index.html'),
             filename: 'index.html',
             title: projectTitle
         }),
