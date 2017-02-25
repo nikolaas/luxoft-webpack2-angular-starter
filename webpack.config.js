@@ -1,18 +1,27 @@
 const path = require('path');
 const webpack = require('webpack');
+const autoprefixer = require('autoprefixer');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
+const findImports = require('find-imports');
 
 const angular = path.resolve('./node_modules', 'angular/angular.js');
 const moment = path.resolve('./node_modules', 'moment/min/moment.min.js');
 
 const projectTitle = 'Luxoft Web App Starter';
+const baseUrl = '/';
 
 const PATHS = {
     app: path.resolve(__dirname, 'app'),
     dist: path.resolve(__dirname, 'dist')
 };
+
+const DEPENDENCIES = findImports([
+    'app/**/*.js', '!app/**/*.spec.js', '!app/spec-runner.js'
+], {flatten: true});
+
+console.log(JSON.stringify(DEPENDENCIES));
 
 const jsRule = {
     test: /\.js$/,
@@ -40,7 +49,7 @@ const userStylesRule = {
     test: /\.(css|styl|stylus)$/,
     use: ExtractTextPlugin.extract({
         fallback: 'style-loader',
-        use: 'css-loader!stylus-loader'
+        use: 'css-loader!postcss-loader!stylus-loader'
     }),
     exclude: /node_modules/
 };
@@ -87,11 +96,11 @@ module.exports = {
         noParse: /lodash|angular|bootstrap\.min\.css/
     },
     plugins: [
-        /*new webpack.LoaderOptionsPlugin({
+        new webpack.LoaderOptionsPlugin({
             options: {
-
+                postcss: [autoprefixer({browsers: ['last 2 versions']})],
             }
-        }),*/
+        }),
         new webpack.optimize.UglifyJsPlugin({
             sourceMap: true
         }),
@@ -104,7 +113,8 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: path.resolve(PATHS.app, 'index.html'),
             filename: 'index.html',
-            title: projectTitle
+            title: projectTitle,
+            baseUrl: baseUrl
         }),
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new CleanWebpackPlugin(PATHS.dist, {
