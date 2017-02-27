@@ -1,13 +1,11 @@
 const path = require('path');
 const webpack = require('webpack');
+const merge = require('webpack-merge');
 const autoprefixer = require('autoprefixer');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const findImports = require('find-imports');
-
-const angular = path.resolve('./node_modules', 'angular/angular.js');
-const moment = path.resolve('./node_modules', 'moment/min/moment.min.js');
 
 const projectTitle = 'Luxoft Web App Starter';
 const baseUrl = '/';
@@ -16,12 +14,6 @@ const PATHS = {
     app: path.resolve(__dirname, 'app'),
     dist: path.resolve(__dirname, 'dist')
 };
-
-const DEPENDENCIES = findImports([
-    'app/**/*.js', '!app/**/*.spec.js', '!app/spec-runner.js'
-], {flatten: true});
-
-console.log(JSON.stringify(DEPENDENCIES));
 
 const jsRule = {
     test: /\.js$/,
@@ -79,9 +71,19 @@ const fontsRule = {
     ]
 };
 
-module.exports = {
-    devtool: '#source-map',
-    cache: true,
+const userInlineStylesRule = {
+    test: /\.(css|styl|stylus)$/,
+    use: ['style-loader', 'css-loader', 'postcss-loader', 'stylus-loader'],
+    exclude: /node_modules/
+};
+
+const vendorInlineStylesRule = {
+    test: /\.css$/,
+    use: ['style-loader', 'css-loader'],
+    include: /node_modules/
+};
+
+const common = {
     context: PATHS.app,
     entry: {
         app: './index.js',
@@ -92,8 +94,12 @@ module.exports = {
         filename: '[name]-[hash].js'
     },
     module: {
-        rules: [jsRule, esLintRule, userStylesRule, vendorStylesRule, htmlRule, fontsRule],
-        noParse: /lodash|angular|bootstrap\.min\.css/
+        rules: [
+            jsRule,
+            esLintRule,
+            htmlRule,
+            fontsRule
+        ]
     },
     plugins: [
         new webpack.LoaderOptionsPlugin({
@@ -101,15 +107,6 @@ module.exports = {
                 postcss: [autoprefixer({browsers: ['last 2 versions']})],
             }
         }),
-        new webpack.optimize.UglifyJsPlugin({
-            sourceMap: true
-        }),
-        new webpack.optimize.CommonsChunkPlugin({
-            name: 'vendors',
-            minChunks: 2,
-            filename: '[name]-[hash].js'
-        }),
-        new ExtractTextPlugin("styles.css"),
         new HtmlWebpackPlugin({
             template: path.resolve(PATHS.app, 'index.html'),
             filename: 'index.html',
@@ -122,10 +119,85 @@ module.exports = {
         })
     ],
     resolve: {
+        unsafeCache: true,
         alias: {
-            'angular': angular,
-            'moment': moment
+
         },
         extensions: ["*", ".js", ".styl"]
     }
 };
+
+const build = {
+    devtool: '#source-map',
+    module: {
+        rules: [
+            userStylesRule,
+            vendorStylesRule
+        ]
+    },
+    plugins: [
+        new webpack.optimize.UglifyJsPlugin({
+            sourceMap: true
+        }),
+        new ExtractTextPlugin("styles.css")
+    ]
+};
+
+const DEPENDENCIES = findImports([
+    'app/**/*.js', '!app/**/*.spec.js', '!app/spec-runner.js'
+], {flatten: true});
+
+const extractBundle = (name, deps) => ({
+    entry: {
+        [name]: deps
+    },
+    plugins: [
+        new webpack.optimize.CommonsChunkPlugin({names: [name], minChunks: Infinity})
+    ]
+});
+
+const serve = {
+    cache: true,
+    devtool: '#inline-source-map',
+    module: {
+        rules: [
+            userInlineStylesRule,
+            vendorInlineStylesRule
+        ]
+    }
+    /*devServer: {
+        port: DEV_PORT,
+        historyApiFallback: true,
+        stats: 'errors-only',
+        host: DEV_HOST,
+        hot: true,
+        inline: true,
+        proxy: {
+            [appEnv.backend + '/!*']: {
+                target: process.env.BACKEND_URL || 'http://localhost:10080',
+                pathRewrite: {
+                    [appEnv.backend]: ''
+                },
+                changeOrigin: true
+            }
+        }
+    },*/
+};
+
+let config;
+
+switch (process.env.npm_lifecycle_event) {
+    case 'build':
+        config = merge(common, extractBundle('vendors', DEPENDENCIES), build);
+        break;
+    case 'serve':
+        config = merge(common, extractBundle('vendor', DEPENDENCIES), serve);
+        break;
+    default:
+        config = common;
+        break;
+}
+
+module.exports = config;
+
+/*TODO tests + base angular structure*/
