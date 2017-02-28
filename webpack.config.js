@@ -7,7 +7,7 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const findImports = require('find-imports');
 
-const projectTitle = 'Luxoft Web App Starter';
+const projectTitle = 'Luxoft Web App Starter';  /*TODO*/
 const baseUrl = '/';
 
 const PATHS = {
@@ -99,8 +99,9 @@ const common = {
             esLintRule,
             htmlRule,
             fontsRule
-        ]
-    },
+        ]/*,
+        noParse: /lodash|angular|bootstrap\.min\.css/*/
+},
     plugins: [
         new webpack.LoaderOptionsPlugin({
             options: {
