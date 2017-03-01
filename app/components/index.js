@@ -1,6 +1,6 @@
 import angular from 'angular';
-import app from './app/app.component';
+import app from './app';
 
-export default angular.module('app.components', [])
-    .component(app.name, app.config)
-    .name;
+export default angular.module('app.components', [
+    app
+]).name;
