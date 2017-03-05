@@ -86,7 +86,7 @@ const vendorInlineStylesRule = {
 const common = {
     context: PATHS.src,
     entry: {
-        app: './index.js',
+        app: './app.js',
         vendors: ['moment', 'angular']
     },
     output: {
