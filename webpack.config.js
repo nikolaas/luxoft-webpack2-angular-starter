@@ -11,7 +11,7 @@ const projectTitle = 'Luxoft Web App Starter';  /*TODO*/
 const baseUrl = '/';
 
 const PATHS = {
-    app: path.resolve(__dirname, 'app'),
+    src: path.resolve(__dirname, 'src'),
     dist: path.resolve(__dirname, 'dist')
 };
 
@@ -65,7 +65,7 @@ const htmlRule = {
 
 const fontsRule = {
     test: /\.(png|woff(2)?|eot|ttf)(\?[a-z0-9=\.]+)?$/,
-    include: /app/,
+    include: PATHS.src,
     use: [
         {loader: 'file-loader?name=assets/[name].[ext]'}
     ]
@@ -84,7 +84,7 @@ const vendorInlineStylesRule = {
 };
 
 const common = {
-    context: PATHS.app,
+    context: PATHS.src,
     entry: {
         app: './index.js',
         vendors: ['moment', 'angular']
@@ -109,7 +109,7 @@ const common = {
             }
         }),
         new HtmlWebpackPlugin({
-            template: path.resolve(PATHS.app, 'index.html'),
+            template: path.resolve(PATHS.src, 'index.html'),
             filename: 'index.html',
             title: projectTitle,
             baseUrl: baseUrl
@@ -145,7 +145,7 @@ const build = {
 };
 
 const DEPENDENCIES = findImports([
-    'app/**/*.js', '!app/**/*.spec.js', '!app/spec-runner.js'
+    'src/**/*.js', '!src/**/*.spec.js', '!src/spec-runner.js'
 ], {flatten: true});
 
 const extractBundle = (name, deps) => ({
