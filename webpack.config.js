@@ -185,21 +185,29 @@ const serve = {
     },*/
 };
 
+/* Should we remove this test config? */
+const test = {
+    devtool: '#inline-source-map',
+    module: {
+        rules: [
+            userInlineStylesRule,
+            vendorInlineStylesRule
+        ]
+    }
+};
+
 let config;
 
 switch (process.env.npm_lifecycle_event) {
     case 'build':
-    case 'debug':
         config = merge(common, extractBundle('vendors', DEPENDENCIES), build);
         break;
     case 'serve':
         config = merge(common, extractBundle('vendors', DEPENDENCIES), serve);
         break;
     default:
-        config = common;
+        config = merge(common, test);
         break;
 }
 
 module.exports = config;
-
-/*TODO tests + base angular structure*/

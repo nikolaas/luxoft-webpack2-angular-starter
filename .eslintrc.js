@@ -3,11 +3,9 @@ module.exports = {
     'parserOptions': {
         'sourceType': 'module'
     },
-    /* TODO Have to replace with "env": {
-     "browser": false,
-     "node": true
-     }*/
-    'globals': {
-        'document': true
+    "env": {
+        "browser": true,
+        "node": true,
+        "mocha": true
     }
 };
