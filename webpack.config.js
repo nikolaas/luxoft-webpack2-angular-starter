@@ -189,10 +189,11 @@ let config;
 
 switch (process.env.npm_lifecycle_event) {
     case 'build':
+    case 'debug':
         config = merge(common, extractBundle('vendors', DEPENDENCIES), build);
         break;
     case 'serve':
-        config = merge(common, extractBundle('vendor', DEPENDENCIES), serve);
+        config = merge(common, extractBundle('vendors', DEPENDENCIES), serve);
         break;
     default:
         config = common;
