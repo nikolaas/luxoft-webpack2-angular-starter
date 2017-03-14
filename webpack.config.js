@@ -15,6 +15,8 @@ const PATHS = {
     dist: path.resolve(__dirname, 'dist')
 };
 
+const DEPENDENCIES = findImports(['src/**/*.js', '!src/**/*.spec.js', '!src/spec-runner.js'], {flatten: true});
+
 const jsRule = {
     test: /\.js$/,
     use: [
@@ -87,7 +89,7 @@ const common = {
     context: PATHS.src,
     entry: {
         app: './app.js',
-        vendors: ['moment', 'angular']
+        vendors: DEPENDENCIES
     },
     output: {
         path: PATHS.dist,
@@ -103,6 +105,7 @@ const common = {
         noParse: /lodash|angular|bootstrap\.min\.css/*/
 },
     plugins: [
+        new webpack.optimize.CommonsChunkPlugin({names: ['vendors'], minChunks: Infinity}),
         new webpack.LoaderOptionsPlugin({
             options: {
                 postcss: [autoprefixer({browsers: ['last 2 versions']})],
@@ -143,19 +146,6 @@ const build = {
         new ExtractTextPlugin("styles.css")
     ]
 };
-
-const DEPENDENCIES = findImports([
-    'src/**/*.js', '!src/**/*.spec.js', '!src/spec-runner.js'
-], {flatten: true});
-
-const extractBundle = (name, deps) => ({
-    entry: {
-        [name]: deps
-    },
-    plugins: [
-        new webpack.optimize.CommonsChunkPlugin({names: [name], minChunks: Infinity})
-    ]
-});
 
 const serve = {
     cache: true,
@@ -200,10 +190,10 @@ let config;
 
 switch (process.env.npm_lifecycle_event) {
     case 'build':
-        config = merge(common, extractBundle('vendors', DEPENDENCIES), build);
+        config = merge(common, build);
         break;
     case 'serve':
-        config = merge(common, extractBundle('vendors', DEPENDENCIES), serve);
+        config = merge(common, serve);
         break;
     default:
         config = merge(common, test);

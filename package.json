@@ -31,7 +31,7 @@
     "eslint-plugin-angular": "^1.6.1",
     "extract-text-webpack-plugin": "^2.0.0-rc.3",
     "file-loader": "^0.10.0",
-    "find-imports": "^0.5.1",
+    "find-imports": "^0.5.2",
     "html-loader": "^0.4.4",
     "html-webpack-plugin": "^2.28.0",
     "karma": "^1.5.0",
